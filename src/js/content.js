@@ -60,7 +60,10 @@ function isExpandable(node) {
          !UNEXPANDABLE.test(node.tagName) && node.visible();
 }
 
-/* Highlight all text that matches regex */
+/* Highlight all text that matches regex.
+   TODO? permit whitespace to match a line-break in the input text?
+   Currently \s* will do so, but ' ' (space) will not even if the line break
+   is not presented to the user. */
 function highlight(regex, highlightColor, selectedColor, textColor, maxResults) {
   function highlightRecursive(node) {
     if(searchInfo.length >= maxResults){

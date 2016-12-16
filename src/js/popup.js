@@ -4,13 +4,13 @@ var DEFAULT_CASE_INSENSITIVE = false;
 var ERROR_COLOR = '#ff8989';
 var WHITE_COLOR = '#ffffff';
 var ERROR_TEXT = "Content script was not loaded. Are you currently in the Chrome Web Store or in a chrome:// page? If you are, content scripts won't work here. If not, please wait for the page to finish loading or refresh the page.";
-/*** CONSTANTS ***/
+/*** /CONSTANTS ***/
 
 /*** VARIABLES ***/
 var sentInput = false;  // true => Enter goes to next match
 var searchIsInProgress = false; // true => we're waiting for content.js to
                                 // process the current search.
-/*** VARIABLES ***/
+/*** /VARIABLES ***/
 
 /*** FUNCTIONS ***/
 
@@ -90,6 +90,7 @@ function passInputToContentScript() {
     );
   } //endif not searchIsInProgress
 }
+/*** /FUNCTIONS ***/
 
 /*** LISTENERS ***/
 document.getElementById('next').addEventListener('click', function() {
@@ -136,24 +137,31 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
  * Thanks a lot to http://stackoverflow.com/users/1175714/braden-best for this
  * technique.  http://stackoverflow.com/a/12444641/2877364
  */
-var MAP_SHIFT = 16;
-var MAP_ENTER = 13;
+var KEYCODE_SHIFT = 16;
+var KEYCODE_ENTER = 13;
 var map = [];
+// TODO check whether this is interfering with Ctrl+tabbing
 onkeydown = onkeyup = function(e) {
     map[e.keyCode] = (e.type == 'keydown');
-    if (document.getElementById('inputRegex') === document.activeElement) { //input element is in focus
-      if (!map[MAP_SHIFT] && map[MAP_ENTER]) {        // Enter
+    if ( //input element is in focus, and Enter changed state.
+         (document.getElementById('inputRegex') === document.activeElement) &&
+         (e.keyCode == KEYCODE_ENTER)
+       )    // without the keycode test, toggling Shift jumps around
+    {
+      if (!map[KEYCODE_SHIFT] && map[KEYCODE_ENTER]) {        // Enter
         if (sentInput) {
           selectNext();
         } else {
           passInputToContentScript();
         }
-      } else if (map[MAP_SHIFT] && map[MAP_ENTER]) {  // Shift+Enter
+      } else if (map[KEYCODE_SHIFT] && map[KEYCODE_ENTER]) {  // Shift+Enter
         selectPrev();
       }
     }
 }
-/*** LISTENERS ***/
+// TODO make spacebar activate the next, prev, reset buttons.  Currently only
+// Enter does.
+/*** /LISTENERS ***/
 
 /*** INIT ***/
 /* Retrieve from storage whether we should use instant results or not.
@@ -223,5 +231,5 @@ window.setTimeout(
   function(){document.getElementById('inputRegex').select();}, 0);
 //Thanks to http://stackoverflow.com/questions/480735#comment40578284_14573552
 
-/*** INIT ***/
+/*** /INIT ***/
 
